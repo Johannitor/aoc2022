@@ -1,5 +1,7 @@
+import { yellow } from 'colorette';
+
 export class Logger {
-  static printCenteredText(
+  static centeredText(
     width: number,
     text: string,
     modifierFn: (value: string) => string = (v) => v
@@ -20,5 +22,17 @@ export class Logger {
     }
 
     console.log(modifierFn(result));
+  }
+
+  static partHeader(part: number) {
+    console.log(yellow(`PART ${part}`));
+  }
+
+  static segmentStart(label: string) {
+    console.log('> ' + label);
+  }
+
+  static segmentFinish(label: string) {
+    console.log('* ' + label);
   }
 }

@@ -11,8 +11,8 @@ function printTitle() {
   console.clear();
   console.log(headlineModifier('#'.repeat(printWidth)));
   console.log(headlineModifier(' '.repeat(printWidth)));
-  Logger.printCenteredText(printWidth, 'Advent of Code 2022', headlineModifier);
-  Logger.printCenteredText(printWidth, 'by Johann Lochbaum', (v) =>
+  Logger.centeredText(printWidth, 'Advent of Code 2022', headlineModifier);
+  Logger.centeredText(printWidth, 'by Johann Lochbaum', (v) =>
     italic(headlineModifier(v))
   );
   console.log(headlineModifier(' '.repeat(printWidth)));
@@ -35,7 +35,7 @@ async function run() {
   if (Number.isNaN(doorNumber) || doorNumber < 1 || doorNumber > 24)
     throw new Error('Not a valid door number!');
 
-  console.log(white(`>>> Running door #${doorNumber}`));
+  console.log(white(`Running door #${doorNumber}`));
   console.log('-'.repeat(printWidth));
   console.log();
 

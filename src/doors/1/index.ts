@@ -1,11 +1,14 @@
-import { red, yellow } from 'colorette';
+import { red, underline, whiteBright, yellow } from 'colorette';
 import { join } from 'node:path';
 import { AbstractDoor } from '../../lib/AbstractDoor';
+import { Logger } from '../../lib/Logger';
 import { ArrayUtil } from '../../lib/util/array';
 import { MathUtil } from '../../lib/util/math';
 
 class ElfPouch {
   public carriedFood: number[] = [];
+
+  constructor(public identifier: number) {}
 
   get totalCalories(): number {
     return this.carriedFood.reduce((item, acc) => acc + item, 0);
@@ -18,63 +21,83 @@ class ElfPouch {
 
 export default class DoorOne extends AbstractDoor {
   public async run() {
-    console.log(yellow('PART 1'));
-    console.log('> Collecting food from all pouches and pockets of Elfs...');
+    Logger.segmentStart('Analyzing list of Elf pouch contents...');
 
-    const elfs: ElfPouch[] = [];
-    let currentPouch = new ElfPouch();
+    const elves: ElfPouch[] = [];
+    let currentPouch = new ElfPouch(elves.length);
 
     for await (const line of this.readFileByLineInterator(
       join(__dirname, './input.txt')
     )) {
+      // Append to current elves inventory
       if (line) {
         const food = parseInt(line.trim());
 
         if (Number.isNaN(food) || food <= 0)
           throw Error(
-            'Found a strange food item... Aborting search to not violate any health codes.'
+            'Found a strange food item... Aborting search due to risk of health code violation.'
           );
 
         currentPouch.addFood(food);
         continue;
       }
 
-      elfs.push(currentPouch);
-      currentPouch = new ElfPouch();
+      // Add elf to list and start a new one
+      elves.push(currentPouch);
+      currentPouch = new ElfPouch(elves.length);
     }
 
-    if (!elfs.length)
+    if (!elves.length)
       throw Error(
-        "All Elfs weren't carrying any food... They must be up to something"
+        'None of the Elves is carrying any food... They must be up to something O_O'
       );
 
-    console.log('* Collected all food items and counted their calories! \n');
-
-    console.log('> Sorting all Elfs by the amount of Calories carried...');
-    ArrayUtil.sortByKey(elfs, 'totalCalories', 'DESC');
-
-    console.log(
-      '* The Elf carrying the most Calories is carrying a total of ' +
-        red(this.formatInt(elfs.at(0)?.totalCalories!)) +
-        ' Calories! \n'
+    const totalFoodItems = elves.reduce(
+      (acc, elf) => acc + elf.carriedFood.length,
+      0
+    );
+    Logger.segmentFinish(
+      `Finished analyzing ${whiteBright(
+        this.formatInt(totalFoodItems)
+      )} food items of ${whiteBright(this.formatInt(elves.length))} Elves. \n`
     );
 
-    console.log(yellow('PART 2'));
-    console.log(
-      '> Searching for the 3 Elfs with the highest total Calorie count...'
+    // ##### PART 1
+    Logger.partHeader(1);
+    Logger.segmentStart(
+      'Calculating total amount of Calories carried by each Elf...'
+    );
+    // Sort elves by totalCalories to be able to get top values more easily
+    ArrayUtil.sortByKey(elves, 'totalCalories', 'DESC');
+
+    const elfWithMostTotalCalories = elves.at(0)!;
+    Logger.segmentFinish(
+      `The Elf carrying the most Calories is ${red(
+        '#' + elfWithMostTotalCalories.identifier
+      )} with a total of ${red(
+        this.formatInt(elfWithMostTotalCalories.totalCalories!)
+      )} Calories!\n`
     );
 
-    const top3totalCalories = elfs
-      .slice(0, 3)
-      .map((pouch) => pouch.totalCalories);
+    // ##### PART 2
+    Logger.partHeader(2);
+    Logger.segmentStart(
+      'Searching for the three Elves carrying the most Calories...'
+    );
 
-    console.log(
-      `* The Elfs carrying the highest total Calories carried are carrying ${red(
+    const top3Elves = elves.slice(0, 3);
+    const totalCaloriesOfTop3 = top3Elves.map((pouch) => pouch.totalCalories);
+
+    Logger.segmentFinish(
+      `The three Elves carrying the most Calories are: ${red(
         this.formatListAnd(
-          top3totalCalories.reverse().map((pouch) => this.formatInt(pouch))
+          top3Elves.map(
+            (elf) =>
+              `#${elf.identifier} (${this.formatInt(elf.totalCalories)} cal)`
+          )
         )
-      )} Calories. Adding up to a total of ${red(
-        this.formatInt(MathUtil.sum(...top3totalCalories))
+      )}. Adding up to a total of ${red(
+        this.formatInt(MathUtil.sum(...totalCaloriesOfTop3))
       )} Calories. \n`
     );
   }
