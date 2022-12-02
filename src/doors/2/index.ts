@@ -3,9 +3,9 @@ import { join } from 'node:path';
 import { AbstractDoor } from '../../lib/AbstractDoor';
 
 enum Shapes {
-  Rock,
-  Paper,
-  Scissors,
+  Rock = 'rock',
+  Paper = 'paper',
+  Scissors = 'scissorts',
 }
 
 const shapePointMap: Record<Shapes, number> = {
@@ -15,9 +15,9 @@ const shapePointMap: Record<Shapes, number> = {
 };
 
 enum ResultType {
-  Draw,
-  Win,
-  Loose,
+  Draw = 'draw',
+  Win = 'win',
+  Loose = 'loose',
 }
 
 const resultPointMap: Record<ResultType, number> = {
@@ -47,7 +47,15 @@ const resultMap: Record<Shapes, Record<Shapes, ResultType>> = {
 class Match {
   constructor(public opponentShape: Shapes, public suggestedMove: string) {}
 
-  pickShape() {
+  getPoints(part: 1 | 2) {
+    const playerShape =
+      part === 1 ? this.pickShapePartOne() : this.pickShapePartTwo();
+    const matchResult = resultMap[playerShape][this.opponentShape];
+
+    return shapePointMap[playerShape] + resultPointMap[matchResult];
+  }
+
+  private pickShapePartOne() {
     switch (this.suggestedMove.toUpperCase()) {
       case 'X':
         return Shapes.Rock;
@@ -63,11 +71,38 @@ class Match {
     }
   }
 
-  getPoints() {
-    const playerShape = this.pickShape();
-    const matchResult = resultMap[playerShape][this.opponentShape];
+  private pickShapePartTwo() {
+    switch (this.suggestedMove.toUpperCase()) {
+      case 'X':
+        return this.findMoveByExpectedResult(
+          this.opponentShape,
+          ResultType.Loose
+        );
 
-    return shapePointMap[playerShape] + resultPointMap[matchResult];
+      case 'Y':
+        return this.findMoveByExpectedResult(
+          this.opponentShape,
+          ResultType.Draw
+        );
+
+      case 'Z':
+        return this.findMoveByExpectedResult(
+          this.opponentShape,
+          ResultType.Win
+        );
+
+      default:
+        throw Error('Unknown instruction found!');
+    }
+  }
+
+  private findMoveByExpectedResult(
+    opponentShape: Shapes,
+    expectedResult: ResultType
+  ) {
+    return Object.values(Shapes).find(
+      (shape) => resultMap[shape][opponentShape] === expectedResult
+    )!;
   }
 }
 
@@ -89,10 +124,17 @@ export default class DoorTwo extends AbstractDoor {
 
     let totalScore = 0;
     strategyGuide.forEach((match) => {
-      totalScore += match.getPoints();
+      totalScore += match.getPoints(1);
     });
 
     console.log(totalScore);
+
+    let totalScorePart2 = 0;
+    strategyGuide.forEach((match) => {
+      totalScorePart2 += match.getPoints(2);
+    });
+
+    console.log(totalScorePart2);
   }
 
   private parsePlayerMove(move: string): Shapes {
