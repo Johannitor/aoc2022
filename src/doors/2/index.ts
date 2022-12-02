@@ -1,6 +1,7 @@
-import { red } from 'colorette';
+import { red, whiteBright } from 'colorette';
 import { join } from 'node:path';
 import { AbstractDoor } from '../../lib/AbstractDoor';
+import { Logger } from '../../lib/Logger';
 
 enum Shapes {
   Rock = 'rock',
@@ -108,6 +109,7 @@ class Match {
 
 export default class DoorTwo extends AbstractDoor {
   public async run() {
+    Logger.segmentStart('Analyzing strategy guide...');
     const strategyGuide: Match[] = [];
 
     for await (const line of this.readFileByLineInterator(
@@ -120,21 +122,41 @@ export default class DoorTwo extends AbstractDoor {
       );
     }
 
-    console.log(`Found a total of ${red(strategyGuide.length)} games!`);
+    Logger.segmentFinish(
+      `Finished analyzing ${whiteBright(
+        this.formatInt(strategyGuide.length)
+      )} strategies.\n`
+    );
 
-    let totalScore = 0;
+    // ##### PART 1
+    Logger.partHeader(1);
+    Logger.segmentStart('Calculating total score using suggested shapes...');
+    let totalScorePart1 = 0;
     strategyGuide.forEach((match) => {
-      totalScore += match.getPoints(1);
+      totalScorePart1 += match.getPoints(1);
     });
 
-    console.log(totalScore);
+    Logger.segmentFinish(
+      `Using the suggested shapes, the total score is ${red(
+        this.formatInt(totalScorePart1)
+      )} \n`
+    );
 
+    // ##### PART 2
+    Logger.partHeader(2);
+    Logger.segmentStart(
+      'Calculating total score by achieving suggested result...'
+    );
     let totalScorePart2 = 0;
     strategyGuide.forEach((match) => {
       totalScorePart2 += match.getPoints(2);
     });
 
-    console.log(totalScorePart2);
+    Logger.segmentFinish(
+      `Using the suggested results, the total score is ${red(
+        this.formatInt(totalScorePart2)
+      )} \n`
+    );
   }
 
   private parsePlayerMove(move: string): Shapes {
