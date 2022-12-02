@@ -12,6 +12,11 @@ export abstract class AbstractDoor {
   public abstract run(): Promise<void>;
 
   readFileByLineInterator(path: string) {
+    // While this method is not the fastests (adds ~10ms), it offers a convenient API for
+    // aoc challenges, as they mainly tend to require to read the input line by line.
+    //
+    // Faster replacement:
+    // return (await readFile(path)).toString().split('\n')
     const readStream = createReadStream(path);
 
     return createInterface({ input: readStream, crlfDelay: Infinity });

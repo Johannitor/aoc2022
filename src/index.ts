@@ -49,7 +49,10 @@ async function run() {
 
   const door: AbstractDoor = new doorImport.default();
 
+  const startMs = Date.now();
   await door.run();
+  const endMs = Date.now();
+  console.log(`It took a total of ${endMs - startMs}ms to run this door!`);
 }
 
 run().catch((e) => {
