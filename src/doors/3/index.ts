@@ -1,3 +1,4 @@
+import { red } from 'colorette';
 import { join } from 'node:path';
 import { AbstractDoor } from '../../lib/AbstractDoor';
 import { Logger } from '../../lib/Logger';
@@ -44,24 +45,36 @@ function getItemPriority(item: string) {
 
 export default class DoorThree extends AbstractDoor {
   public async run() {
+    Logger.segmentStart('Analyzing backpacks...');
     const backpacks: Backpack[] = [];
-
     for await (const line of this.readFileByLineInterator(
       join(__dirname, './input.txt')
     )) {
       backpacks.push(new Backpack(line));
     }
+    Logger.segmentFinish('Finished analyzing contents of backpacks.\n');
 
     // ####### PART 1
     Logger.partHeader(1);
+    Logger.segmentStart(
+      'Determining the total priority of all items common between pockets...'
+    );
+
     let prioritySumPart1 = 0;
     backpacks.forEach((backpack) => {
       prioritySumPart1 += getItemPriority(backpack.getCommonItemInPockets());
     });
-    console.log(prioritySumPart1);
+
+    Logger.segmentFinish(
+      `The total priority is ${red(this.formatInt(prioritySumPart1))} \n`
+    );
 
     // ####### PART 2
     Logger.partHeader(2);
+    Logger.segmentStart(
+      'Determining the total priority of all items common between bagpacks of group...'
+    );
+
     let prioritySumPart2 = 0;
     for (let i = 0; i < backpacks.length; i += 3) {
       const [backpack1, backpack2, backpack3] = backpacks
@@ -76,6 +89,9 @@ export default class DoorThree extends AbstractDoor {
 
       prioritySumPart2 += getItemPriority(commonItem);
     }
-    console.log(prioritySumPart2);
+
+    Logger.segmentFinish(
+      `The total priority is ${red(this.formatInt(prioritySumPart2))} \n`
+    );
   }
 }
