@@ -1,5 +1,6 @@
 import { join } from 'node:path';
 import { AbstractDoor } from '../../lib/AbstractDoor';
+import { Logger } from '../../lib/Logger';
 
 class Backpack {
   private pockets: [string[], string[]];
@@ -12,6 +13,10 @@ class Backpack {
       contents.slice(0, perPocketItemCount).split(''),
       contents.slice(perPocketItemCount).split(''),
     ];
+  }
+
+  get contents() {
+    return this.pockets.flat();
   }
 
   getCommonItemInPockets() {
@@ -47,11 +52,30 @@ export default class DoorThree extends AbstractDoor {
       backpacks.push(new Backpack(line));
     }
 
-    let prioritySum = 0;
-
+    // ####### PART 1
+    Logger.partHeader(1);
+    let prioritySumPart1 = 0;
     backpacks.forEach((backpack) => {
-      prioritySum += getItemPriority(backpack.getCommonItemInPockets());
+      prioritySumPart1 += getItemPriority(backpack.getCommonItemInPockets());
     });
-    console.log(prioritySum);
+    console.log(prioritySumPart1);
+
+    // ####### PART 2
+    Logger.partHeader(2);
+    let prioritySumPart2 = 0;
+    for (let i = 0; i < backpacks.length; i += 3) {
+      const [backpack1, backpack2, backpack3] = backpacks
+        .slice(i, i + 3)
+        .map((backpack) => backpack.contents);
+
+      const commonItem = backpack1.find(
+        (item) => backpack2.includes(item) && backpack3.includes(item)
+      );
+      if (!commonItem)
+        throw Error(`Group #${i} has no common item in bagpacks!`);
+
+      prioritySumPart2 += getItemPriority(commonItem);
+    }
+    console.log(prioritySumPart2);
   }
 }
