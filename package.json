@@ -12,9 +12,12 @@
   },
   "devDependencies": {
     "@types/node": "^18.11.9",
-    "@types/prompts": "^2.4.1"
+    "@types/number-to-words": "^1.2.1",
+    "@types/prompts": "^2.4.1",
+    "number-to-words": "^1.2.4"
   },
   "scripts": {
-    "start": "ts-node src/index.ts"
+    "start": "ts-node src/index.ts",
+    "generate": "ts-node src/generate.ts"
   }
 }
