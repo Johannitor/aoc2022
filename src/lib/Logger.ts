@@ -33,6 +33,6 @@ export class Logger {
   }
 
   static segmentFinish(label: string) {
-    console.log('* ' + label);
+    console.log('* ' + label + '\n');
   }
 }

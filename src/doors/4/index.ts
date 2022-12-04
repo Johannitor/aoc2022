@@ -1,5 +1,4 @@
-import { red } from 'colorette';
-import { throws } from 'node:assert';
+import { red, white } from 'colorette';
 import { join } from 'node:path';
 import { AbstractDoor } from '../../lib/AbstractDoor';
 import { Logger } from '../../lib/Logger';
@@ -59,6 +58,8 @@ class CleanupJob {
 
 export default class DoorFour extends AbstractDoor {
   public async run() {
+    Logger.segmentStart('Analyzing assignments list...');
+
     const jobPairs: [CleanupJob, CleanupJob][] = [];
     for await (const line of this.readFileByLineInterator(
       join(__dirname, './input.txt')
@@ -70,27 +71,38 @@ export default class DoorFour extends AbstractDoor {
         CleanupJob.fromRangeString(job2),
       ]);
     }
-    console.log(`Found ${red(this.formatInt(jobPairs.length))} job pairs!`);
+    Logger.segmentFinish(
+      `Found a total of ${white(this.formatInt(jobPairs.length))} job pairs!`
+    );
 
     // ##### PART 1
     Logger.partHeader(1);
-
+    Logger.segmentStart(
+      'Determining the amount of job pairs where one jobs range is completly covered by the other jobs range...'
+    );
     let pairsWithFullOverlaps = 0;
     for (const [job1, job2] of jobPairs) {
       if (job1.isCompletlyWithin(job2) || job2.isCompletlyWithin(job1)) {
         pairsWithFullOverlaps++;
       }
     }
-    console.log(pairsWithFullOverlaps);
+    Logger.segmentFinish(
+      `Found ${red(this.formatInt(pairsWithFullOverlaps))} job pairs!`
+    );
 
     // ##### PART 2
     Logger.partHeader(2);
+    Logger.segmentStart(
+      'Determining the amount of job pairs where their ranges overlap ...'
+    );
     let pairsWithPartialOverlaps = 0;
     for (const [job1, job2] of jobPairs) {
       if (job1.hasOverlapWith(job2)) {
         pairsWithPartialOverlaps++;
       }
     }
-    console.log(pairsWithPartialOverlaps);
+    Logger.segmentFinish(
+      `Found ${red(this.formatInt(pairsWithPartialOverlaps))} job pairs!`
+    );
   }
 }
