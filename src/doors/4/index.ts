@@ -31,9 +31,29 @@ class CleanupJob {
     return this.assignedSections;
   }
 
+  private isStartingWithin(job: CleanupJob): boolean {
+    return job.rangeStart <= this.rangeStart && job.rangeEnd >= this.rangeStart;
+  }
+
+  private isEndingWithin(job: CleanupJob): boolean {
+    return job.rangeStart <= this.rangeEnd && job.rangeEnd >= this.rangeEnd;
+  }
+
   // Checks if this jobs range is completly within the job-parameters range
-  public isCompletlyCoveredBy(job: CleanupJob): boolean {
-    return job.rangeStart <= this.rangeStart && job.rangeEnd >= this.rangeEnd;
+  public isCompletlyWithin(job: CleanupJob): boolean {
+    return this.isStartingWithin(job) && this.isEndingWithin(job);
+  }
+
+  // Checks if this jobs range has a overlap with the job-parameters range
+  public hasOverlapWith(job: CleanupJob): boolean {
+    // jobs have a partial overlap or this-job is completly within job-parameter
+    if (this.isStartingWithin(job) || this.isEndingWithin(job)) return true;
+
+    // job-parameter is compleatly within this-job
+    if (this.rangeStart < job.rangeStart && this.rangeEnd > job.rangeEnd)
+      return true;
+
+    return false;
   }
 }
 
@@ -55,12 +75,22 @@ export default class DoorFour extends AbstractDoor {
     // ##### PART 1
     Logger.partHeader(1);
 
-    let pairsWithOverlaps = 0;
+    let pairsWithFullOverlaps = 0;
     for (const [job1, job2] of jobPairs) {
-      if (job1.isCompletlyCoveredBy(job2) || job2.isCompletlyCoveredBy(job1)) {
-        pairsWithOverlaps++;
+      if (job1.isCompletlyWithin(job2) || job2.isCompletlyWithin(job1)) {
+        pairsWithFullOverlaps++;
       }
     }
-    console.log(pairsWithOverlaps);
+    console.log(pairsWithFullOverlaps);
+
+    // ##### PART 2
+    Logger.partHeader(2);
+    let pairsWithPartialOverlaps = 0;
+    for (const [job1, job2] of jobPairs) {
+      if (job1.hasOverlapWith(job2)) {
+        pairsWithPartialOverlaps++;
+      }
+    }
+    console.log(pairsWithPartialOverlaps);
   }
 }
