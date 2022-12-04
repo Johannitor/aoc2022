@@ -23,18 +23,34 @@ async function run() {
   const nextDoor = lastDoor + 1;
   const nextDoorAsWord = toWords(nextDoor);
 
-  console.log('Generating door #' + nextDoor);
+  console.log('Generating next door #' + nextDoor);
 
   const nextDoorDirectory = doorsDirectory + '/' + nextDoor;
   await mkdir(nextDoorDirectory);
   await writeFile(nextDoorDirectory + '/input.txt', '');
 
-  const templateCode = `import { AbstractDoor } from '../../lib/AbstractDoor';
+  const templateCode = `import { join } from 'node:path';
+import { AbstractDoor } from '../../lib/AbstractDoor';
+import { Logger } from '../../lib/Logger';
 
 export default class Door${StringUtil.toTitleCase(
     nextDoorAsWord
   )} extends AbstractDoor {
-    public async run() {}
+    public async run() {
+      // ##### PREPARE
+      for await (const line of this.readFileByLineInterator(
+        join(__dirname, './input.txt')
+      )) {
+      }
+
+      // ##### PART 1
+      Logger.partHeader(1);
+      console.log('TODO');
+
+      // ##### PART 2
+      Logger.partHeader(2);
+      console.log('TODO');
+    }
 }
   `;
 
