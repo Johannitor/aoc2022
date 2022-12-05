@@ -1,7 +1,6 @@
 {
   "name": "advent-of-code-2022",
   "version": "1.0.0",
-  "main": "index.js",
   "license": "MIT",
   "dependencies": {
     "colorette": "^2.0.19",
@@ -17,7 +16,7 @@
     "number-to-words": "^1.2.4"
   },
   "scripts": {
-    "start": "ts-node src/index.ts",
-    "generate": "ts-node src/generate.ts"
+    "start": "ts-node index.ts",
+    "generate": "ts-node generate.ts"
   }
 }

@@ -7,7 +7,7 @@ class Warehouse {
   protected constructor(private _stacks: Crate[][]) {}
 
   static fromHeader(rawHeaderLines: string[]) {
-    // Step 1: Reverse header to be able to build stacks from the bottom up
+    // Step 1: Reverse header to be able read the stack indecies first and build stacks from the bottom up
     const [stackIndecies, ...stackContents] = [...rawHeaderLines].reverse();
 
     // Step 2: Find indecies of stack labels && prepare an empty stack array for each found label
