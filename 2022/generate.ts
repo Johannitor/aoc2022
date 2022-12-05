@@ -1,7 +1,7 @@
 import { mkdir, readdir, writeFile } from 'node:fs/promises';
 import { resolve } from 'node:path';
 import { toWords } from 'number-to-words';
-import { StringUtil } from './lib/util/string';
+import { StringUtil } from '@shared/utils/string';
 
 async function getInputForDay(day: number): Promise<string> {
   const sessionToken = process.env.SESSION_TOKEN;
@@ -33,7 +33,7 @@ async function getInputForDay(day: number): Promise<string> {
 }
 
 async function run() {
-  const doorsDirectory = resolve('./src/doors');
+  const doorsDirectory = resolve('./doors');
 
   const existingDoors = (await readdir(doorsDirectory, { withFileTypes: true }))
     .filter((dirent) => dirent.isDirectory())
@@ -54,8 +54,8 @@ async function run() {
   await writeFile(nextDoorDirectory + '/input.txt', doorInput);
 
   const templateCode = `import { join } from 'node:path';
-import { AbstractDoor } from '../../lib/AbstractDoor';
-import { Logger } from '../../lib/Logger';
+import { AbstractDoor } from '@shared/lib/AbstractDoor';
+import { Logger } from '@shared/lib/Logger';
 
 export default class Door${StringUtil.toTitleCase(
     nextDoorAsWord
