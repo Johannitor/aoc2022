@@ -5,9 +5,25 @@ __metadata:
   version: 6
   cacheKey: 8
 
-"@advent-of-code/2022@workspace:.":
+"@advent-of-code/2021@workspace:2021":
   version: 0.0.0-use.local
-  resolution: "@advent-of-code/2022@workspace:."
+  resolution: "@advent-of-code/2021@workspace:2021"
+  dependencies:
+    "@types/node": ^18.11.9
+    "@types/number-to-words": ^1.2.1
+    "@types/prompts": ^2.4.1
+    colorette: ^2.0.19
+    commander: ^9.4.1
+    number-to-words: ^1.2.4
+    prompts: ^2.4.2
+    ts-node: ^10.9.1
+    typescript: ^4.9.3
+  languageName: unknown
+  linkType: soft
+
+"@advent-of-code/2022@workspace:2022":
+  version: 0.0.0-use.local
+  resolution: "@advent-of-code/2022@workspace:2022"
   dependencies:
     "@types/node": ^18.11.9
     "@types/number-to-words": ^1.2.1
@@ -54,6 +70,18 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@shared/lib@workspace:shared/lib":
+  version: 0.0.0-use.local
+  resolution: "@shared/lib@workspace:shared/lib"
+  languageName: unknown
+  linkType: soft
+
+"@shared/utils@workspace:shared/utils":
+  version: 0.0.0-use.local
+  resolution: "@shared/utils@workspace:shared/utils"
+  languageName: unknown
+  linkType: soft
+
 "@tsconfig/node10@npm:^1.0.7":
   version: 1.0.9
   resolution: "@tsconfig/node10@npm:1.0.9"
@@ -82,10 +110,26 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@types/line-reader@npm:0.0.30":
+  version: 0.0.30
+  resolution: "@types/line-reader@npm:0.0.30"
+  dependencies:
+    "@types/node": "*"
+  checksum: 599c2a262ace885d5a61204b2e65fb455dfd9ab937c20bc2d8a3b16b93a611fbab33a173b10537d5ab220401cd94eb45aec3370b5da2cbd86a489f930e375c50
+  languageName: node
+  linkType: hard
+
 "@types/node@npm:*, @types/node@npm:^18.11.9":
-  version: 18.11.9
-  resolution: "@types/node@npm:18.11.9"
-  checksum: cc0aae109e9b7adefc32eecb838d6fad931663bb06484b5e9cbbbf74865c721b03d16fd8d74ad90e31dbe093d956a7c2c306ba5429ba0c00f3f7505103d7a496
+  version: 18.11.10
+  resolution: "@types/node@npm:18.11.10"
+  checksum: 0f60cb090b2ee91fcd3dc4311bc1ed7889b92f14644c0069f100776f86474c12eebbcc6c75bc0d7d96b975a103b4d5d6b3c22b4e88bea6e7f4e2b1bb0daf5ea8
+  languageName: node
+  linkType: hard
+
+"@types/node@npm:^14.14.10":
+  version: 14.18.34
+  resolution: "@types/node@npm:14.18.34"
+  checksum: 25ac3b456a0b7b82c76b37276ec86845849e8276fc81d1470a87227c105c619e299aa7165b6148aa11a4ea156b1452f6d3327935f3e7dc0067ff54dde0e3d4e0
   languageName: node
   linkType: hard
 
@@ -121,10 +165,35 @@ __metadata:
   languageName: node
   linkType: hard
 
+"advent-of-code-2020@workspace:2020":
+  version: 0.0.0-use.local
+  resolution: "advent-of-code-2020@workspace:2020"
+  dependencies:
+    "@types/line-reader": 0.0.30
+    "@types/node": ^14.14.10
+    line-reader: ^0.4.0
+    ts-node: ^9.0.0
+    typescript: ^4.1.2
+  languageName: unknown
+  linkType: soft
+
+"advent-of-code@workspace:.":
+  version: 0.0.0-use.local
+  resolution: "advent-of-code@workspace:."
+  languageName: unknown
+  linkType: soft
+
 "arg@npm:^4.1.0":
   version: 4.1.3
   resolution: "arg@npm:4.1.3"
   checksum: 544af8dd3f60546d3e4aff084d451b96961d2267d668670199692f8d054f0415d86fc5497d0e641e91546f0aa920e7c29e5250e99fc89f5552a34b5d93b77f43
+  languageName: node
+  linkType: hard
+
+"buffer-from@npm:^1.0.0":
+  version: 1.1.2
+  resolution: "buffer-from@npm:1.1.2"
+  checksum: 0448524a562b37d4d7ed9efd91685a5b77a50672c556ea254ac9a6d30e3403a517d8981f10e565db24e8339413b43c97ca2951f10e399c6125a0d8911f5679bb
   languageName: node
   linkType: hard
 
@@ -163,6 +232,13 @@ __metadata:
   languageName: node
   linkType: hard
 
+"line-reader@npm:^0.4.0":
+  version: 0.4.0
+  resolution: "line-reader@npm:0.4.0"
+  checksum: 94d02c3d03af6303cf201ccf4e5099aac78595fc82e344c3bde3c0b9f968d616928b6f4f94d585a4570af854e9aac1080deaad64cce86f43a1ec9c59ce1b7516
+  languageName: node
+  linkType: hard
+
 "make-error@npm:^1.1.1":
   version: 1.3.6
   resolution: "make-error@npm:1.3.6"
@@ -191,6 +267,23 @@ __metadata:
   version: 1.0.5
   resolution: "sisteransi@npm:1.0.5"
   checksum: aba6438f46d2bfcef94cf112c835ab395172c75f67453fe05c340c770d3c402363018ae1ab4172a1026a90c47eaccf3af7b6ff6fa749a680c2929bd7fa2b37a4
+  languageName: node
+  linkType: hard
+
+"source-map-support@npm:^0.5.17":
+  version: 0.5.21
+  resolution: "source-map-support@npm:0.5.21"
+  dependencies:
+    buffer-from: ^1.0.0
+    source-map: ^0.6.0
+  checksum: 43e98d700d79af1d36f859bdb7318e601dfc918c7ba2e98456118ebc4c4872b327773e5a1df09b0524e9e5063bb18f0934538eace60cca2710d1fa687645d137
+  languageName: node
+  linkType: hard
+
+"source-map@npm:^0.6.0":
+  version: 0.6.1
+  resolution: "source-map@npm:0.6.1"
+  checksum: 59ce8640cf3f3124f64ac289012c2b8bd377c238e316fb323ea22fbfe83da07d81e000071d7242cad7a23cd91c7de98e4df8830ec3f133cb6133a5f6e9f67bc2
   languageName: node
   linkType: hard
 
@@ -232,7 +325,28 @@ __metadata:
   languageName: node
   linkType: hard
 
-"typescript@npm:^4.9.3":
+"ts-node@npm:^9.0.0":
+  version: 9.1.1
+  resolution: "ts-node@npm:9.1.1"
+  dependencies:
+    arg: ^4.1.0
+    create-require: ^1.1.0
+    diff: ^4.0.1
+    make-error: ^1.1.1
+    source-map-support: ^0.5.17
+    yn: 3.1.1
+  peerDependencies:
+    typescript: ">=2.7"
+  bin:
+    ts-node: dist/bin.js
+    ts-node-script: dist/bin-script.js
+    ts-node-transpile-only: dist/bin-transpile.js
+    ts-script: dist/bin-script-deprecated.js
+  checksum: 356e2647b8b1e6ab00380c0537fa569b63bd9b6f006cc40fd650f81fae1817bd8fecc075300036950d8f45c1d85b95be33cd1e48a1a424a7d86c3dbb42bf60e5
+  languageName: node
+  linkType: hard
+
+"typescript@npm:^4.1.2, typescript@npm:^4.9.3":
   version: 4.9.3
   resolution: "typescript@npm:4.9.3"
   bin:
@@ -242,7 +356,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"typescript@patch:typescript@^4.9.3#~builtin<compat/typescript>":
+"typescript@patch:typescript@^4.1.2#~builtin<compat/typescript>, typescript@patch:typescript@^4.9.3#~builtin<compat/typescript>":
   version: 4.9.3
   resolution: "typescript@patch:typescript@npm%3A4.9.3#~builtin<compat/typescript>::version=4.9.3&hash=d73830"
   bin:

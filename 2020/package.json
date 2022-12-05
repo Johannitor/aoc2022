@@ -2,6 +2,7 @@
   "name": "advent-of-code-2020",
   "version": "1.0.0",
   "description": "",
+  "packageManager": "yarn@3.2.2",
   "scripts": {
     "day-1": "ts-node --transpile-only days/1",
     "day-2": "ts-node --transpile-only days/2",

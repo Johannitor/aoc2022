@@ -14,5 +14,5 @@
   },
   "types": ["node"],
   "exclude": ["node_modules"],
-  "include": ["**/*.ts"]
+  "include": ["**/*.ts", "../shared/lib/AbstractDoor.ts"]
 }

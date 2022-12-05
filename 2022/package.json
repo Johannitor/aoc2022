@@ -1,7 +1,8 @@
 {
-  "name": "advent-of-code-2022",
+  "name": "@advent-of-code/2022",
   "version": "1.0.0",
   "license": "MIT",
+  "packageManager": "yarn@3.2.2",
   "dependencies": {
     "colorette": "^2.0.19",
     "commander": "^9.4.1",

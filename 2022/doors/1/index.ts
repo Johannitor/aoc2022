@@ -1,9 +1,9 @@
-import { red, underline, whiteBright, yellow } from 'colorette';
+import { red, whiteBright } from 'colorette';
 import { join } from 'node:path';
-import { AbstractDoor } from '../../lib/AbstractDoor';
-import { Logger } from '../../lib/Logger';
-import { ArrayUtil } from '../../lib/util/array';
-import { MathUtil } from '../../lib/util/math';
+import { AbstractDoor } from '@shared/lib/AbstractDoor';
+import { Logger } from '@shared/lib/Logger';
+import { ArrayUtil } from '@shared/utils/array';
+import { MathUtil } from '@shared/utils/math';
 
 class ElfPouch {
   public carriedFood: number[] = [];

@@ -1,0 +1,10 @@
+{
+  "name": "advent-of-code",
+  "packageManager": "yarn@3.3.0",
+  "workspaces": [
+    "2020",
+    "2021",
+    "2022",
+    "shared/*"
+  ]
+}

@@ -1,7 +1,7 @@
 import { join } from 'node:path';
-import { AbstractDoor } from '../../lib/AbstractDoor';
-import { Logger } from '../../lib/Logger';
-import { ArrayUtil } from '../../lib/util/array';
+import { AbstractDoor } from '@shared/lib/AbstractDoor';
+import { Logger } from '@shared/lib/Logger';
+import { ArrayUtil } from '@shared/utils/array';
 
 class Warehouse {
   protected constructor(private _stacks: Crate[][]) {}

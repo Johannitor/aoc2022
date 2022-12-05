@@ -1,7 +1,7 @@
 import { red, white } from 'colorette';
 import { join } from 'node:path';
-import { AbstractDoor } from '../../lib/AbstractDoor';
-import { Logger } from '../../lib/Logger';
+import { AbstractDoor } from '@shared/lib/AbstractDoor';
+import { Logger } from '@shared/lib/Logger';
 
 class CleanupJob {
   private _assignedSections?: number[];
