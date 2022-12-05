@@ -1,16 +1,36 @@
-import { Command } from 'commander';
 import { mkdir, readdir, writeFile } from 'node:fs/promises';
 import { resolve } from 'node:path';
 import { toWords } from 'number-to-words';
 import { StringUtil } from './lib/util/string';
 
-const program = new Command();
+async function getInputForDay(day: number): Promise<string> {
+  const sessionToken = process.env.SESSION_TOKEN;
+  if (!sessionToken) throw new Error('Env variable SESSION_TOKEN missing!');
 
-program
-  .name('advent-of-code-2022 codegen')
-  .option('--door <number>', 'Door to run', '1');
+  const result = await fetch(`https://adventofcode.com/2022/day/${day}/input`, {
+    headers: {
+      cookie: `session=${sessionToken}`,
+    },
+  });
 
-program.parse();
+  if (!result.ok) {
+    switch (result.status) {
+      case 400:
+        throw new Error(
+          'Authentication failed! Did you set the SESSION_TOKEN env properly?'
+        );
+
+      case 404:
+        throw new Error('Input not available yet :(');
+
+      default:
+        console.log(await result.text());
+        throw new Error('Unkown error :o');
+    }
+  }
+
+  return await result.text();
+}
 
 async function run() {
   const doorsDirectory = resolve('./src/doors');
@@ -23,11 +43,15 @@ async function run() {
   const nextDoor = lastDoor + 1;
   const nextDoorAsWord = toWords(nextDoor);
 
-  console.log('Generating next door #' + nextDoor);
+  console.log('>> Generating next door #' + nextDoor);
 
+  console.log('Getting challenge input...');
+  const doorInput = await getInputForDay(nextDoor);
+
+  console.log('Generating files...');
   const nextDoorDirectory = doorsDirectory + '/' + nextDoor;
   await mkdir(nextDoorDirectory);
-  await writeFile(nextDoorDirectory + '/input.txt', '');
+  await writeFile(nextDoorDirectory + '/input.txt', doorInput);
 
   const templateCode = `import { join } from 'node:path';
 import { AbstractDoor } from '../../lib/AbstractDoor';
