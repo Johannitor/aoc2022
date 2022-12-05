@@ -37,20 +37,24 @@ class Warehouse {
     return new Warehouse(stacks);
   }
 
-  public operateCrane(instruction: CraneInstruction): void {
-    for (
-      let moveOperation = 0;
-      moveOperation < instruction.amount;
-      ++moveOperation
-    ) {
-      // Step 1: Grab item from top of from-stack
-      const grabbedItem = this._stacks[instruction.fromIndex].pop();
-      if (!grabbedItem)
-        throw new Error('Attemped to grab an item from an empty stack!');
+  public operateCraneMover9000(instruction: CraneInstruction): void {
+    // Step 1: Grab items from top of from-stack
+    const grabbedItems = this._stacks[instruction.fromIndex].splice(
+      -instruction.amount
+    );
 
-      // Step 2: Place item on top of to-stack
-      this._stacks[instruction.toIndex].push(grabbedItem);
-    }
+    // Step 2: Place items on top of to-stack
+    this._stacks[instruction.toIndex].push(...grabbedItems.reverse());
+  }
+
+  public operateCraneMover9001(instruction: CraneInstruction): void {
+    // Step 1: Grab items from top of from-stack
+    const grabbedItems = this._stacks[instruction.fromIndex].splice(
+      -instruction.amount
+    );
+
+    // Step 2: Place items on top of to-stack
+    this._stacks[instruction.toIndex].push(...grabbedItems);
   }
 
   public getTopItems(): Crate[] {
@@ -130,7 +134,7 @@ export default class DoorFive extends AbstractDoor {
     Logger.partHeader(1);
     const warehousePart1 = Warehouse.fromHeader(headerLines);
     instructions.forEach((instruction) =>
-      warehousePart1.operateCrane(instruction)
+      warehousePart1.operateCraneMover9000(instruction)
     );
     console.log(
       warehousePart1
@@ -141,6 +145,15 @@ export default class DoorFive extends AbstractDoor {
 
     // ##### PART 2
     Logger.partHeader(2);
-    console.log('TODO');
+    const warehousePart2 = Warehouse.fromHeader(headerLines);
+    instructions.forEach((instruction) =>
+      warehousePart2.operateCraneMover9001(instruction)
+    );
+    console.log(
+      warehousePart2
+        .getTopItems()
+        .map((item) => item?.toString())
+        .join('')
+    );
   }
 }
