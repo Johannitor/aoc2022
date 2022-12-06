@@ -1,4 +1,5 @@
 import { createReadStream } from 'node:fs';
+import { readFile } from 'node:fs/promises';
 import { createInterface } from 'node:readline/promises';
 
 export abstract class AbstractDoor {
@@ -20,6 +21,10 @@ export abstract class AbstractDoor {
     const readStream = createReadStream(path);
 
     return createInterface({ input: readStream, crlfDelay: Infinity });
+  }
+
+  readFile(path: string) {
+    return readFile(path, { encoding: 'utf-8' });
   }
 
   formatInt(value: number): string {

@@ -1,7 +1,7 @@
 import { bold, italic, red, white } from 'colorette';
 import { Command } from 'commander';
-import { AbstractDoor } from '../shared/lib/AbstractDoor';
-import { Logger } from './lib/Logger';
+import { AbstractDoor } from '@shared/lib/AbstractDoor';
+import { Logger } from '@shared/lib/Logger';
 
 const printWidth = 64;
 

@@ -1,4 +1,7 @@
 {
   "name": "@shared/lib",
-  "packageManager": "yarn@3.2.2"
+  "packageManager": "yarn@3.2.2",
+  "devDependencies": {
+    "@types/node": "^18.11.9"
+  }
 }
