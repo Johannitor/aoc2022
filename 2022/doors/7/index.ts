@@ -144,28 +144,43 @@ export default class DoorSeven extends AbstractDoor {
       }
     }
 
-    // ##### PART 1
-    Logger.partHeader(1);
-    let directoriesUnderSizeLimit: number[] = [];
-    const part1SizeLimit = 100_000;
-
+    let directorySizes: number[] = [];
     function discoverSubdirectories(directory: DirectoryNode) {
       for (let subDir of directory.subDirectories.values()) {
         const dirSize = subDir.size;
 
-        if (dirSize <= part1SizeLimit) {
-          directoriesUnderSizeLimit.push(dirSize);
-        }
+        directorySizes.push(dirSize);
 
         discoverSubdirectories(subDir);
       }
     }
     discoverSubdirectories(fileSystem);
-    // TOO LOW
-    console.log(MathUtil.sum(...directoriesUnderSizeLimit));
+
+    // ##### PART 1
+    Logger.partHeader(1);
+    console.log(MathUtil.sum(...directorySizes.filter((v) => v <= 100_000)));
 
     // ##### PART 2
     Logger.partHeader(2);
-    console.log('TODO');
+
+    // Determine how much space we need to cleanup
+    const totalSpace = 70_000_000;
+    const requiredSpace = 30_000_000;
+    const usedSpace = fileSystem.size;
+    const freeSpace = totalSpace - usedSpace;
+    const missingFreeSpace = requiredSpace - freeSpace;
+
+    // Prepare items for algorithm by sorting them in ascending order
+    directorySizes.sort((a, b) => a - b);
+
+    // Go through each item and find the first one thats larger than the space we need to
+    // clear
+    let lastValue: number = -1;
+    for (const size of directorySizes) {
+      lastValue = size;
+
+      if (size > missingFreeSpace) break;
+    }
+    console.log(lastValue);
   }
 }
