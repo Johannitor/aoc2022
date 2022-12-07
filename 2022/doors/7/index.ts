@@ -2,6 +2,8 @@ import { join } from 'node:path';
 import { AbstractDoor } from '@shared/lib/AbstractDoor';
 import { Logger } from '@shared/lib/Logger';
 import { MathUtil } from '@shared/utils/math';
+import { bold, italic, red, underline, white, yellow } from 'colorette';
+import { printWidth } from '../..';
 
 abstract class FsNode {
   abstract get size(): number;
@@ -20,6 +22,26 @@ class DirectoryNode extends FsNode {
 
   get size(): number {
     return this.getSizeOfSubDirectories() + this.getTotalSizeOfFiles();
+  }
+
+  // NOTE: This try to replicate the folder view seen inside the challenge
+  toString(depth: number = 0) {
+    let subDirsString = '';
+    for (const subDir of this.subDirectories.values()) {
+      subDirsString += subDir.toString(depth + 1);
+    }
+
+    let filesString = '';
+    for (let file of this.files) {
+      filesString += file.toString(depth + 1);
+      filesString += '\n';
+    }
+
+    return (
+      `${' '.repeat(depth * 2)}- ${white(this.name)} (dir)\n` +
+      subDirsString +
+      filesString
+    );
   }
 
   private getSizeOfSubDirectories(): number {
@@ -45,6 +67,12 @@ class FileNode extends FsNode {
   get size(): number {
     return this._size;
   }
+
+  toString(depth: number) {
+    return `${' '.repeat(depth * 2)}- ${white(this.name)} (file, size=${
+      this._size
+    })`;
+  }
 }
 
 class TerminalUtil {
@@ -63,7 +91,7 @@ export default class DoorSeven extends AbstractDoor {
       terminalOutput.push(line.split(' '));
     }
 
-    const fileSystem = new DirectoryNode('');
+    const fileSystem = new DirectoryNode('/');
     let currentDirectory = fileSystem;
 
     let lsOutputBuffer: string[][] = [];
@@ -144,25 +172,54 @@ export default class DoorSeven extends AbstractDoor {
       }
     }
 
-    let directorySizes: number[] = [];
+    let directorySizes: { size: number; name: string }[] = [];
     function discoverSubdirectories(directory: DirectoryNode) {
       for (let subDir of directory.subDirectories.values()) {
-        const dirSize = subDir.size;
+        const { size } = subDir;
+        let nameSegments = [];
+        let currentDir: DirectoryNode | undefined = subDir;
+        do {
+          nameSegments.push(currentDir.name);
+          currentDir = currentDir.parentDir;
+        } while (currentDir);
 
-        directorySizes.push(dirSize);
+        directorySizes.push({ size, name: nameSegments.reverse().join('/') });
 
         discoverSubdirectories(subDir);
       }
     }
     discoverSubdirectories(fileSystem);
 
+    console.log(white(bold('Directory overview')));
+    console.log(fileSystem.toString());
+
+    console.log('-'.repeat(printWidth));
+    console.log();
+
     // ##### PART 1
     Logger.partHeader(1);
-    console.log(MathUtil.sum(...directorySizes.filter((v) => v <= 100_000)));
+    Logger.segmentStart(
+      'Collecting all directories with a total size smaller than 100k'
+    );
+    const directoriesBelowSizeLimit = directorySizes.filter(
+      (v) => v.size <= 100_000
+    );
+    Logger.segmentFinish(
+      `Found a total of ${red(
+        this.formatInt(directoriesBelowSizeLimit.length)
+      )} directories below size limit totaling a szie of ${red(
+        this.formatInt(
+          directoriesBelowSizeLimit.reduce((acc, d) => acc + d.size, 0)
+        )
+      )}`
+    );
 
     // ##### PART 2
     Logger.partHeader(2);
 
+    Logger.segmentStart(
+      'Calculating how much disk space needs to be freed up...'
+    );
     // Determine how much space we need to cleanup
     const totalSpace = 70_000_000;
     const requiredSpace = 30_000_000;
@@ -170,17 +227,30 @@ export default class DoorSeven extends AbstractDoor {
     const freeSpace = totalSpace - usedSpace;
     const missingFreeSpace = requiredSpace - freeSpace;
 
-    // Prepare items for algorithm by sorting them in ascending order
-    directorySizes.sort((a, b) => a - b);
+    Logger.segmentFinish(
+      `A total of ${red(
+        this.formatInt(missingFreeSpace)
+      )} bytes need to be cleared.`
+    );
 
+    // Prepare items for algorithm by sorting them in ascending order
+    directorySizes.sort((a, b) => a.size - b.size);
+
+    Logger.segmentStart(
+      'Determining best single directory to delete in order to free up enough space...'
+    );
     // Go through each item and find the first one thats larger than the space we need to
     // clear
-    let lastValue: number = -1;
-    for (const size of directorySizes) {
-      lastValue = size;
+    let lastDir: { name: string; size: number } | null = null;
+    for (const dir of directorySizes) {
+      lastDir = dir;
 
-      if (size > missingFreeSpace) break;
+      if (lastDir?.size > missingFreeSpace) break;
     }
-    console.log(lastValue);
+    Logger.segmentFinish(
+      `Smallest directory freeing up enough space is ${white(
+        underline(lastDir?.name!)
+      )} with a size of ${red(this.formatInt(lastDir?.size!))}`
+    );
   }
 }

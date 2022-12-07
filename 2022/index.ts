@@ -3,7 +3,7 @@ import { Command } from 'commander';
 import { AbstractDoor } from '@shared/lib/AbstractDoor';
 import { Logger } from '@shared/lib/Logger';
 
-const printWidth = 64;
+export const printWidth = 64;
 
 function printTitle() {
   const headlineModifier = (v: string) => bold(red(v));
