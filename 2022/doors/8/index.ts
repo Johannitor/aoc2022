@@ -10,8 +10,8 @@ interface Point {
 enum ViewingDirection {
   DOWN = 'DOWN',
   UP = 'UP',
-  TO_LEFT = 'TO_LEFT',
-  TO_RIGHT = 'TO_RIGHT',
+  LEFT = 'LEFT',
+  RIGHT = 'RIGHT',
 }
 
 class TreeHeightMap {
@@ -82,12 +82,12 @@ class TreeHeightMap {
         startY = point.y + 1;
         endY = this.mapSize.y;
         break;
-      case ViewingDirection.TO_RIGHT:
+      case ViewingDirection.RIGHT:
         // Compare points on x axis from left edge to point
         startX = 0;
         endX = point.x;
         break;
-      case ViewingDirection.TO_LEFT:
+      case ViewingDirection.LEFT:
         // Compare points on x axis from point to right edge
         startX = point.x + 1;
         endX = this.mapSize.x;
@@ -108,12 +108,73 @@ class TreeHeightMap {
     // Couldn't find a larger tree -> tree at point is visible from edge
     return true;
   }
+
+  calcScenicScoreForPoint(point: Point) {
+    if (!this.pointIsOnMap(point))
+      throw Error(
+        `Attempted to access point outside of map! (Coordinates: ${point.x},${point.y})`
+      );
+
+    return Object.values(ViewingDirection).reduce<number>(
+      (acc, direction) => acc * this.treesVisibleInDirection(point, direction),
+      1
+    );
+  }
+
+  private treesVisibleInDirection(
+    point: Point,
+    viewingDirection: ViewingDirection
+  ) {
+    const treeSizeAtPoint = this.valueAt(point);
+    let visibleTrees = 0;
+
+    switch (viewingDirection) {
+      case ViewingDirection.UP:
+        for (let y = point.y - 1; y >= 0; --y) {
+          ++visibleTrees;
+
+          if (this.valueAt({ x: point.x, y }) >= treeSizeAtPoint) {
+            break;
+          }
+        }
+        break;
+      case ViewingDirection.DOWN:
+        for (let y = point.y + 1; y < this.mapSize.x; ++y) {
+          ++visibleTrees;
+
+          if (this.valueAt({ x: point.x, y }) >= treeSizeAtPoint) {
+            break;
+          }
+        }
+        break;
+      case ViewingDirection.LEFT:
+        for (let x = point.x - 1; x >= 0; --x) {
+          ++visibleTrees;
+
+          if (this.valueAt({ x, y: point.y }) >= treeSizeAtPoint) {
+            break;
+          }
+        }
+        break;
+      case ViewingDirection.RIGHT:
+        for (let x = point.x + 1; x < this.mapSize.x; ++x) {
+          ++visibleTrees;
+
+          if (this.valueAt({ x, y: point.y }) >= treeSizeAtPoint) {
+            break;
+          }
+        }
+        break;
+    }
+
+    return visibleTrees;
+  }
 }
 
 export default class DoorEight extends AbstractDoor {
   public async run() {
     console.log(
-      'Example:',
+      'Example part 1:',
       await this.runPart1OnMap('./example-input.txt'),
       '\n'
     );
@@ -122,9 +183,16 @@ export default class DoorEight extends AbstractDoor {
     Logger.partHeader(1);
     console.log(await this.runPart1OnMap('./input.txt'));
 
+    console.log();
+    console.log(
+      'Example part 2:',
+      await this.runPart2OnMap('./example-input.txt'),
+      '\n'
+    );
+
     // ##### PART 2
     Logger.partHeader(2);
-    console.log('TODO');
+    console.log(await this.runPart2OnMap('./input.txt'));
   }
 
   private async runPart1OnMap(mapFile: string) {
@@ -146,5 +214,24 @@ export default class DoorEight extends AbstractDoor {
     }
 
     return treesVisibleFromOutsideTheGrid.length;
+  }
+
+  private async runPart2OnMap(mapFile: string) {
+    const input = await this.readFile(join(__dirname, mapFile));
+    const map = TreeHeightMap.fromString(input);
+
+    const { x: mapSizeX, y: mapSizeY } = map.mapSize;
+
+    // Check for every position if it is visible from the edge
+    const scenicScoreOfTrees = [];
+    for (let cy = 0; cy < mapSizeY; ++cy) {
+      for (let cx = 0; cx < mapSizeX; ++cx) {
+        const scenicScore = map.calcScenicScoreForPoint({ x: cx, y: cy });
+
+        scenicScoreOfTrees.push(scenicScore);
+      }
+    }
+
+    return Math.max(...scenicScoreOfTrees);
   }
 }
