@@ -40,51 +40,66 @@ class Movement {
 }
 
 class Map {
-  private head = new Point(0, 0);
-  private tail = new Point(0, 0);
+  public knots: Point[];
+
+  constructor(knotCount: number) {
+    this.knots = Array.from({ length: knotCount }, () => new Point(0, 0));
+  }
 
   // Visited points will be stored as strings as Typescript does not support a custom equals method :(
   private visitedPoints = new Set<string>();
 
   moveHead(movement: Movement) {
+    const head = this.knots[0];
+
     for (let i = 0; i < movement.amount; ++i) {
       switch (movement.direction) {
         case Direction.UP:
-          --this.head.y;
+          --head.y;
           break;
 
         case Direction.RIGHT:
-          ++this.head.x;
+          ++head.x;
           break;
 
         case Direction.DOWN:
-          ++this.head.y;
+          ++head.y;
           break;
 
         case Direction.LEFT:
-          --this.head.x;
+          --head.x;
           break;
       }
 
-      this.updateTailPosition();
+      this.updateTailPosition(1);
     }
   }
 
-  updateTailPosition() {
-    const dx = this.head.x - this.tail.x;
-    const dy = this.head.y - this.tail.y;
+  updateTailPosition(knotIndex: number) {
+    const currentKnot = this.knots[knotIndex];
+    const previousKnot = this.knots[knotIndex - 1];
 
-    if (Math.abs(dx) > 1) {
-      this.tail.y = this.head.y;
+    const dx = previousKnot.x - currentKnot.x;
+    const dy = previousKnot.y - currentKnot.y;
 
-      this.tail.x += dx > 0 ? 1 : -1;
+    if (Math.abs(dx) > 1 && Math.abs(dy) > 1) {
+      currentKnot.x += dx > 0 ? 1 : -1;
+      currentKnot.y += dy > 0 ? 1 : -1;
+    } else if (Math.abs(dx) > 1) {
+      currentKnot.y = previousKnot.y;
+
+      currentKnot.x += dx > 0 ? 1 : -1;
     } else if (Math.abs(dy) > 1) {
-      this.tail.x = this.head.x;
+      currentKnot.x = previousKnot.x;
 
-      this.tail.y += dy > 0 ? 1 : -1;
+      currentKnot.y += dy > 0 ? 1 : -1;
     }
 
-    this.visitedPoints.add(this.tail.toString());
+    if (knotIndex === this.knots.length - 1) {
+      this.visitedPoints.add(currentKnot.toString());
+    } else {
+      this.updateTailPosition(knotIndex + 1);
+    }
   }
 
   visitedPointsCount() {
@@ -96,14 +111,14 @@ export default class DoorNine extends AbstractDoor {
   public async run() {
     // ##### PART 1
     Logger.partHeader(1);
-    console.log(await this.runPart1('./input.txt'));
+    console.log(await this.runPart1('./input.txt', 2));
 
     // ##### PART 2
     Logger.partHeader(2);
-    console.log('TODO');
+    console.log(await this.runPart1('./input.txt', 10));
   }
 
-  async runPart1(file: string) {
+  private async runPart1(file: string, knotCount: number) {
     const movements: Movement[] = [];
     for await (const line of this.readFileByLineInterator(
       join(__dirname, file)
@@ -111,7 +126,7 @@ export default class DoorNine extends AbstractDoor {
       movements.push(Movement.fromString(line));
     }
 
-    const map = new Map();
+    const map = new Map(knotCount);
     movements.forEach((movement) => {
       map.moveHead(movement);
     });
