@@ -9,6 +9,11 @@ abstract class Instruction {
     ++this.cyclesRan;
   }
 
+  reset() {
+    this.isComplete = false;
+    this.cyclesRan = 0;
+  }
+
   abstract isComplete: boolean;
   abstract execute(registers: CPU): void;
 }
@@ -62,17 +67,21 @@ class CPU {
 
   constructor(private instructions: Instruction[]) {}
 
-  private get currentInstruction(): Instruction {
+  get canRun(): boolean {
+    return !!this.currentInstruction;
+  }
+
+  private get currentInstruction(): Instruction | undefined {
     return this.instructions[this.instructionIndex];
   }
 
   cycle(count: number = 1) {
     for (let i = 0; i < count; ++i) {
-      this.currentInstruction.execute(this);
+      this.currentInstruction?.execute(this);
 
-      if (this.currentInstruction.isComplete) ++this.instructionIndex;
+      if (this.currentInstruction?.isComplete) ++this.instructionIndex;
 
-      this.currentInstruction.cycle();
+      this.currentInstruction?.cycle();
 
       ++this.cyclesRan;
     }
@@ -87,10 +96,50 @@ class CPU {
   }
 }
 
+class GPU {
+  private readonly xPixelCount = 40;
+  private readonly yPixelCount = 6;
+
+  private readonly videoMemory: number[][];
+
+  constructor(private readonly cpu: CPU) {
+    // Initialize videoMemory based on size of screen
+    this.videoMemory = Array.from(
+      { length: this.yPixelCount },
+      () => new Array(this.xPixelCount)
+    );
+  }
+
+  cycle() {
+    const pixelIndex = this.cpu.cyclesRan - 1;
+    const registerValue = this.cpu.xRegister;
+
+    const spritePositions = [
+      registerValue,
+      registerValue - 1,
+      registerValue + 1,
+    ];
+
+    const currentX = pixelIndex % this.xPixelCount;
+
+    if (spritePositions.includes(currentX)) {
+      const currentY = Math.floor(pixelIndex / this.xPixelCount);
+
+      this.videoMemory[currentY][currentX] = 1;
+    }
+  }
+
+  render() {
+    return this.videoMemory
+      .map((row) => row.map((pixel) => (pixel ? '\u2588' : ' ')))
+      .join('\n');
+  }
+}
+
 export default class DoorTen extends AbstractDoor {
   public async run() {
-    let instructions: Instruction[] = [];
     // ##### PREPARE
+    let instructions: Instruction[] = [];
     for await (const line of this.readFileByLineInterator(
       join(__dirname, './input.txt')
     )) {
@@ -116,8 +165,20 @@ export default class DoorTen extends AbstractDoor {
 
     console.log(part1Result);
 
+    // This is not the best solution, but we need to reset all instructions after the
+    // first part as they store some internal state which will break the 2nd run
+    instructions.forEach((instruction) => instruction.reset());
+
     // ##### PART 2
     Logger.partHeader(2);
-    console.log('TODO');
+    const part2Cpu = new CPU(instructions);
+    const part2Gpu = new GPU(part2Cpu);
+
+    while (part2Cpu.canRun) {
+      part2Cpu.cycle();
+      part2Gpu.cycle();
+    }
+
+    console.log(part2Gpu.render());
   }
 }
