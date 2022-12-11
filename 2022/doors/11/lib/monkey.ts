@@ -54,14 +54,14 @@ export class Monkey {
   constructor(
     public items: number[],
     private operation: Operation,
-    private test: Test
+    public test: Test
   ) {}
 
   catchItem(item: number) {
     this.items.push(item);
   }
 
-  doMonkeyThingsToFirstItemAndThrow() {
+  doMonkeyThingsToFirstItemAndThrow(part: number = 1, superModulo?: number) {
     let firstItem = this.items.shift();
     if (!firstItem) return;
 
@@ -70,7 +70,11 @@ export class Monkey {
     firstItem = this.operation.run(firstItem);
 
     // get bored with item
-    firstItem = Math.floor(firstItem / 3);
+    if (part === 1) {
+      firstItem = Math.floor(firstItem / 3);
+    } else {
+      firstItem = Math.floor(firstItem % superModulo!);
+    }
 
     // throw item
     return { item: firstItem, to: this.test.execute(firstItem) };

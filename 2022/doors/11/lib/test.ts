@@ -12,7 +12,7 @@ type Condition = {
 
 export class Test {
   constructor(
-    private condition: Condition,
+    public condition: Condition,
     private whenTrueResult: number,
     private whenFalseResult: number
   ) {}
