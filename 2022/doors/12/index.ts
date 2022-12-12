@@ -9,6 +9,19 @@ class Map {
     public endPosition: [number, number]
   ) {}
 
+  elevationAt([x, y]: [number, number]) {
+    return this.elevations[y][x];
+  }
+
+  isOnMap([x, y]: [number, number]) {
+    return (
+      x >= 0 &&
+      y >= 0 &&
+      x < this.elevations[0].length &&
+      y < this.elevations.length
+    );
+  }
+
   static fromLines(lines: string[]) {
     const elevations: Uint8Array[] = [];
     let startPosition: [number, number] | undefined;
@@ -73,14 +86,30 @@ class PriorityQueue<T> {
 class NavigationSystem {
   static getShortestRouteBetween(
     from: [number, number],
-    to: [number, number],
+    [toX, toY]: [number, number],
     map: Map
   ) {
+    return this.getShortestRouteUntilConditionIsReached(
+      from,
+      map,
+      ([x, y]) => x === toX && y === toY
+    );
+  }
+
+  static getShortestRouteUntilConditionIsReached(
+    start: [number, number],
+    map: Map,
+    condition: (point: [number, number]) => boolean,
+    config: { maxUpwardsStepSize: number; maxDownwardsStepSize: number } = {
+      maxDownwardsStepSize: Infinity,
+      maxUpwardsStepSize: 1,
+    }
+  ) {
     const queue = new PriorityQueue<[number, number][]>();
-    queue.enqueue(0, [from]);
+    queue.enqueue(0, [start]);
 
     let whileLimit = 0;
-    const visitedPoints: [number, number][] = [];
+    const alreadyVisitedPoints: [number, number][] = [];
     while (whileLimit < 100_000 && queue.hasNext) {
       const shortestPath = queue.dequeue()!;
       const headOfPath = shortestPath.at(-1)!;
@@ -88,45 +117,49 @@ class NavigationSystem {
       const [headX, headY] = headOfPath;
 
       // Are we at the goal?
-      if (headX === to[0] && headY === to[1]) {
+      if (condition(headOfPath)) {
         return shortestPath;
       }
 
       // Create a point in every direction we can theoretically move
-      const possibleSurroundingPoints = [
+      const nextPointCandidates: [number, number][] = [
         [headX + 1, headY],
         [headX - 1, headY],
         [headX, headY + 1],
         [headX, headY - 1],
       ];
 
-      const elevationAtLastPoint = map.elevations[headY][headX];
-      for (const [x, y] of possibleSurroundingPoints) {
+      const elevationAtHeadOfPath = map.elevationAt(headOfPath);
+      for (const nextPointCandidate of nextPointCandidates) {
+        const [x, y] = nextPointCandidate;
+
         // Skip points outside the map
-        if (
-          x < 0 ||
-          y < 0 ||
-          x >= map.elevations[0].length ||
-          y >= map.elevations.length
-        ) {
+        if (!map.isOnMap(nextPointCandidate)) {
           continue;
         }
 
         // Skip points with a too large elevation change
-        const elevationAtPoint = map.elevations[y][x];
-        const relativeElevation = elevationAtPoint - elevationAtLastPoint;
-        if (relativeElevation > 1) {
-          continue;
+        const elevationAtCandidate = map.elevationAt(nextPointCandidate);
+        const relativeElevation = elevationAtCandidate - elevationAtHeadOfPath;
+        if (relativeElevation >= 0) {
+          // We're going uphill
+          if (relativeElevation > config.maxUpwardsStepSize) continue;
+        } else {
+          // We're going downhill
+          if (Math.abs(relativeElevation) > config.maxDownwardsStepSize)
+            continue;
         }
 
         // Skip already visited points
         if (
-          visitedPoints.some(([pointX, pointY]) => pointX === x && pointY === y)
+          alreadyVisitedPoints.some(
+            ([pointX, pointY]) => pointX === x && pointY === y
+          )
         ) {
           continue;
         }
 
-        visitedPoints.push([x, y]);
+        alreadyVisitedPoints.push([x, y]);
 
         const pathWithNewPoint: [number, number][] = [...shortestPath, [x, y]];
         queue.enqueue(pathWithNewPoint.length, pathWithNewPoint);
@@ -163,6 +196,18 @@ export default class DoorTwelve extends AbstractDoor {
 
     // ##### PART 2
     Logger.partHeader(2);
-    console.log('TODO');
+    const part2Result =
+      NavigationSystem.getShortestRouteUntilConditionIsReached(
+        map.endPosition,
+        map,
+        (point) => map.elevationAt(point) === 0,
+        // We're plotting the reverse path from the top here, so we need to make sure that we flip our max elevation change restrictions
+        // here, as the trail will be walked on in the other direction
+        { maxDownwardsStepSize: 1, maxUpwardsStepSize: Infinity }
+      );
+    console.log(
+      'Amount of steps required to reach a square at elevation "a" from the peak is:',
+      part2Result?.length! - 1
+    );
   }
 }
