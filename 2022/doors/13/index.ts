@@ -70,13 +70,13 @@ function comparePair(
 export default class DoorThirteen extends AbstractDoor {
   public async run() {
     // ##### PREPARE
-    const example = await this.parseFile('example-input.txt');
-    const exampleResult = example
+    const examplePart1 = await this.parseFile('example-input.txt');
+    const examplePart1Result = examplePart1
       .map((e, i) => [i + 1, comparePair(e)])
       .filter(([_, result]) => result !== CompareResult.WRONG)
       .map(([index]) => index as number);
 
-    console.log('Example Part 1: ', MathUtil.sum(...exampleResult), '\n');
+    console.log('Example Part 1: ', MathUtil.sum(...examplePart1Result), '\n');
 
     // ##### PART 1
     Logger.partHeader(1);
@@ -90,7 +90,30 @@ export default class DoorThirteen extends AbstractDoor {
 
     // ##### PART 2
     Logger.partHeader(2);
-    console.log('TODO');
+    const examplePart2 = (await this.parseFile('input.txt')).flat();
+
+    // Add divider packages into pool of packages
+    const dividerPackages = [[[2]], [[6]]];
+    examplePart2.push(...dividerPackages);
+
+    // Sort packages
+    examplePart2.sort((a, b) =>
+      comparePair([a, b]) === CompareResult.RIGHT ? -1 : 1
+    );
+
+    // Find indecies of divider packages
+    const [indexFirstPackage, indexSecondPackage] = dividerPackages.map(
+      (dividerPackage) => {
+        return (
+          1 +
+          examplePart2.findIndex(
+            (transmission) =>
+              JSON.stringify(transmission) === JSON.stringify(dividerPackage)
+          )
+        );
+      }
+    );
+    console.log(indexFirstPackage * indexSecondPackage);
   }
 
   async parseFile(file: string) {
