@@ -162,7 +162,7 @@ export default class DoorFourteen extends AbstractDoor {
       'Example part1:',
       part2ExampleSandbox.addNewSandGrainsUntil(
         (point) => point.x === 500 && point.y === 0
-      ) + 1, // Add one as last grain of sant won't be counted
+      ) + 1, // Add one as last grain of sand won't be counted
       '\n'
     );
 
@@ -172,7 +172,7 @@ export default class DoorFourteen extends AbstractDoor {
     console.log(
       part2Sandbox.addNewSandGrainsUntil(
         (point) => point.x === 500 && point.y === 0
-      ) + 1 // Add one as last grain of sant won't be counted
+      ) + 1 // Add one as last grain of sand won't be counted
     );
   }
 
