@@ -5,7 +5,10 @@ import { GeometryUtil } from '@shared/utils/geometry';
 import { ArrayUtil } from '@shared/utils/array';
 
 class Sensor {
-  constructor(private position: GeometryUtil.Point, private range: number) {}
+  constructor(
+    public readonly position: GeometryUtil.Point,
+    public readonly range: number
+  ) {}
 
   canReachY(y: number) {
     // Sensor is below line
@@ -55,6 +58,7 @@ class Sensor {
 export default class DoorFifteen extends AbstractDoor {
   public async run() {
     // ##### PREPARE
+    const exampleSensors = await this.parseFile('./example-input.txt');
     const sensors = await this.parseFile('./input.txt');
 
     // ##### PART 1
@@ -71,7 +75,39 @@ export default class DoorFifteen extends AbstractDoor {
 
     // ##### PART 2
     Logger.partHeader(2);
-    console.log('TODO');
+    const result = this.solvePart2(sensors, 4_000_000, 4_000_000)[0];
+    console.log(result.x * 4_000_000 + result.y);
+  }
+
+  private solvePart2(sensors: Sensor[], areaX: number, areaY: number) {
+    let possiblePoints = sensors
+      .map((sensor) =>
+        // Collect all points that are directly on the outside of each sensors range
+        GeometryUtil.circleAround(sensor.position, sensor.range + 1)
+          .filter(
+            // Remove points that point outside of the map area
+            (point) =>
+              point.x >= 0 &&
+              point.x <= areaX &&
+              point.y >= 0 &&
+              point.y <= areaY
+          )
+          .filter(
+            // Remove points that are in reach of other sensors
+            (point) =>
+              !sensors.some(
+                (sensor) => sensor.position.distanceTo(point) <= sensor.range
+              )
+          )
+      )
+      .flat();
+
+    // Remove duplicate points
+    possiblePoints = ArrayUtil.uniqByFn(possiblePoints, (point) =>
+      point.toCsv()
+    );
+
+    return possiblePoints;
   }
 
   private async parseFile(file: string) {
