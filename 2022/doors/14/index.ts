@@ -2,7 +2,7 @@ import { join } from 'node:path';
 import { AbstractDoor } from '@shared/lib/AbstractDoor';
 import { Logger } from '@shared/lib/Logger';
 import { ArrayUtil } from '@shared/utils/array';
-import { GoemetryUtil } from '@shared/utils/geometry';
+import { GeometryUtil } from '@shared/utils/geometry';
 import { Screen } from '@shared/lib/Screen';
 
 class Point {
@@ -28,7 +28,7 @@ class RockShape implements Shape {
   constructor(cornerPoints: Point[]) {
     this.parts = ArrayUtil.groupPairwise(cornerPoints)!
       .map(([point1, point2]) => {
-        return [point1, ...GoemetryUtil.plotLineBetween(point1, point2)];
+        return [point1, ...GeometryUtil.plotLineBetween(point1, point2)];
       })
       .flat();
     this.parts.push(cornerPoints.at(-1)!);

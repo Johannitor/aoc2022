@@ -67,4 +67,15 @@ export namespace ArrayUtil {
 
     return result;
   }
+
+  export function uniqByFn<T>(array: T[], fn: (item: T) => string) {
+    const resultMap = new Map<string, T>();
+
+    array.forEach((item) => {
+      const key = fn(item);
+      if (!resultMap.has(key)) resultMap.set(key, item);
+    });
+
+    return Array.from(resultMap.values());
+  }
 }
